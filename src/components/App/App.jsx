@@ -67,7 +67,7 @@ export default function App() {
   
         setLoading(false);
         setTotalImages(getImages.totalHits);
-        setImages([...images, ...getImages.hits]);
+        setImages(prevState => [...prevState, ...getImages.hits]);
   
       } catch (error) {
         setLoading(false);
