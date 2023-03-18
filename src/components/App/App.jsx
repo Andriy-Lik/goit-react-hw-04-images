@@ -17,42 +17,9 @@ export default function App() {
   const [totalImages, setTotalImages] = useState(null);
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [currentImageUrl, setCurrentImageUrl] = useState(null);
   const [currentImageDescription, setCurrentImageDescription] = useState(null);
-
-  
-
-  useEffect(() => {
-    const handleSearchImages = async (imgName, page) => {
-      if(prevState.imgName !== imgName || prevState.page !== page) {
-        try {
-          setLoading(true);
-          const getImages = await searchImages(imgName, page);
-    
-          if (!getImages.totalHits) {
-            setLoading(false);
-            setTotalImages(null);
-            return toast.error('No images found for your request!');
-          }
-    
-          setLoading(false);
-          setTotalImages(getImages.totalHits);
-          setImages(getImages.hits);
-    
-        } catch (error) {
-          setLoading(false);
-        } finally {
-          setLoading(false);
-        }
-      }
-      
-    };
-
-    handleSearchImages(imgName, page);
-
-  }, [imgName, page, images]);
 
   const onFormSubmit = imgName => {
     setImgName(imgName);
@@ -80,6 +47,38 @@ export default function App() {
       setCurrentImageDescription(currentImageDescription);
     }
   };
+
+  useEffect(() => {
+    if(!imgName) {
+      return;
+    }
+
+    const handleSearchImages = async () => {
+      
+      try {
+        setLoading(true);
+        const getImages = await searchImages(imgName, page);
+  
+        if (!getImages.totalHits) {
+          setLoading(false);
+          setTotalImages(null);
+          return toast.error('No images found for your request!');
+        }
+  
+        setLoading(false);
+        setTotalImages(getImages.totalHits);
+        setImages([...images, ...getImages.hits]);
+  
+      } catch (error) {
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    handleSearchImages();
+
+  }, [imgName, page]);
 
   const totalPage = images.length / totalImages;
 
